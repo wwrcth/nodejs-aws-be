@@ -1,11 +1,11 @@
 import 'source-map-support/register';
 
 import { formatJSONResponse, formatJSONError } from '@libs/api-gateway';
+import { middyfy } from '@libs/lambda';
 import { GetProductsListService } from '@services/get-products-list.service';
 import { DbConnectService } from '@services/db-connect.service';
-import { middyfy } from '@libs/lambda';
 
-const getProductsList = (getProductsListService?: GetProductsListService) => async () => {
+const getProductsList = (getProductsListService: GetProductsListService) => async () => {
   try {
     const productList = await getProductsListService.getAllProducts();
 
