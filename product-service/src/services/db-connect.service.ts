@@ -1,4 +1,4 @@
-import {Client, ClientConfig, QueryResult} from 'pg';
+import { Client, ClientConfig, QueryResult } from 'pg';
 
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD }: any = process.env;
 

@@ -3,10 +3,10 @@ import Joi from 'joi';
 
 import { formatJSONResponse, formatJSONError } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { CreateProductService } from '@services/create-product.service';
 import { DbConnectService } from '@services/db-connect.service';
+import { ProductService } from '@services/product.service';
 
-const createProduct = (createProductService: CreateProductService) => async (event) => {
+const createProduct = (productService: ProductService) => async (event) => {
   try {
     const newProduct = event.body;
     const newProductValidationScheme = Joi.object({
@@ -21,7 +21,7 @@ const createProduct = (createProductService: CreateProductService) => async (eve
       return formatJSONError({ message: 'Please pass correct product structure' }, 400);
     }
 
-    const createdProduct = await createProductService.createProduct(newProduct);
+    const createdProduct = await productService.createProduct(newProduct);
 
     return formatJSONResponse(createdProduct, 201);
   } catch (err) {
@@ -30,6 +30,6 @@ const createProduct = (createProductService: CreateProductService) => async (eve
 }
 
 const dbConnectService = new DbConnectService();
-const createProductService = new CreateProductService(dbConnectService);
+const productService = new ProductService(dbConnectService);
 
-export const main = middyfy({ handler: createProduct(createProductService), dbConnectService });
+export const main = middyfy({ handler: createProduct(productService), dbConnectService });

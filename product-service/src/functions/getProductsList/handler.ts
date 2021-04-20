@@ -2,12 +2,12 @@ import 'source-map-support/register';
 
 import { formatJSONResponse, formatJSONError } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { GetProductsListService } from '@services/get-products-list.service';
 import { DbConnectService } from '@services/db-connect.service';
+import { ProductService } from '@services/product.service';
 
-const getProductsList = (getProductsListService: GetProductsListService) => async () => {
+const getProductsList = (productService: ProductService) => async () => {
   try {
-    const productList = await getProductsListService.getAllProducts();
+    const productList = await productService.getAllProducts();
 
     return formatJSONResponse(productList);
   } catch (err) {
@@ -16,8 +16,6 @@ const getProductsList = (getProductsListService: GetProductsListService) => asyn
 }
 
 const dbConnectService = new DbConnectService();
-const getProductsListService = new GetProductsListService(dbConnectService);
+const productService = new ProductService(dbConnectService);
 
-export const main = middyfy({ handler: getProductsList(getProductsListService), dbConnectService });
-
-
+export const main = middyfy({ handler: getProductsList(productService), dbConnectService });

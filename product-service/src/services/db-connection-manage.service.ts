@@ -1,4 +1,4 @@
-export const test = (dbConnectService) => ({
+export const dbConnectionManageService = (dbConnectService) => ({
   before: async () => {
     await dbConnectService.connect();
   },

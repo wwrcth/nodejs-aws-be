@@ -3,10 +3,10 @@ import Joi from 'joi';
 
 import { formatJSONResponse, formatJSONError } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { GetProductByIdService } from '@services/get-product-by-id.service';
 import { DbConnectService } from '@services/db-connect.service';
+import { ProductService } from '@services/product.service';
 
-const getProductById = (getProductByIdService: GetProductByIdService) => async (event) => {
+const getProductById = (productService: ProductService) => async (event) => {
   try {
     const productIdValidationScheme = Joi.string().uuid().required();
     const { productId } = event.pathParameters;
@@ -16,7 +16,7 @@ const getProductById = (getProductByIdService: GetProductByIdService) => async (
       return formatJSONError({ message: 'Please pass product id in uuid format' }, 400);
     }
 
-    const product = await getProductByIdService.getProductById(productId);
+    const product = await productService.getProductById(productId);
 
     return product ? formatJSONResponse(product) : formatJSONError({ message: 'Product not found' }, 404);
   } catch (err) {
@@ -25,7 +25,6 @@ const getProductById = (getProductByIdService: GetProductByIdService) => async (
 }
 
 const dbConnectService = new DbConnectService();
-const getProductByIdService = new GetProductByIdService(dbConnectService);
+const productService = new ProductService(dbConnectService);
 
-export const main = middyfy({ handler: getProductById(getProductByIdService), dbConnectService });
-
+export const main = middyfy({ handler: getProductById(productService), dbConnectService });
