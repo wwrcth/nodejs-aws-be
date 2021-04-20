@@ -1,17 +1,24 @@
 import 'source-map-support/register';
 
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
-import { formatJSONResponse, formatJSONError } from '@libs/apiGateway';
-import { middyfy } from '@libs/lambda';
+import {
+  formatJSONResponse,
+  formatJSONError,
+  ValidatedEventAPIGatewayProxyEvent,
+} from '@libs/api-gateway';
+import { GetProductsListService } from '@services/get-products-list.service';
 
-import { productsList } from '../../mocks/products-list';
+export class GetProductsListHandler {
+  constructor(
+    private getProductsListService: GetProductsListService,
+  ) {}
 
-const getProductsList: ValidatedEventAPIGatewayProxyEvent<any> = async () => {
-  try {
-    return formatJSONResponse(productsList);
-  } catch (err) {
-    return formatJSONError({ message: err });
+  handle: ValidatedEventAPIGatewayProxyEvent<any> = async() => {
+    try {
+      const productList = await this.getProductsListService.getAllProducts();
+
+      return formatJSONResponse(productList);
+    } catch (err) {
+      return formatJSONError({ message: err });
+    }
   }
 }
-
-export const main = middyfy(getProductsList);
