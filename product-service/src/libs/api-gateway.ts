@@ -9,9 +9,9 @@ const corsHeaders = {
   'Access-Control-Allow-Credentials': true,
 };
 
-export const formatJSONResponse = (response: Record<string, unknown> | any) => {
+export const formatJSONResponse = (response: Record<string, unknown> | any, statusCode = 200) => {
   return {
-    statusCode: 200,
+    statusCode,
     headers: corsHeaders,
     body: JSON.stringify(response)
   }
