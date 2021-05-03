@@ -1,26 +1,16 @@
 import 'source-map-support/register';
-import AWS from 'aws-sdk';
 
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
 import { formatJSONResponse, formatJSONError } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
+import { S3ManagementService } from '@services/s3-management.service';
 
-const importProductsFile: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
+const importProductsFile = (s3ManagementService: S3ManagementService) => async (event) => {
   try {
     const { name } = event.queryStringParameters;
 
     if (name) {
-      console.log('inside if');
-      const s3 = new AWS.S3({ region: 'eu-west-1', signatureVersion: 'v4' });
-      const params = {
-        Bucket: 'aws-products-file-import',
-        Key: `uploaded/${name}`,
-        Expires: 60,
-        ContentType: 'text/csv',
-        ACL: 'public-read'
-      };
-      const result = await s3.getSignedUrl('putObject', params);
-      console.log('result', result);
+      const result = await s3ManagementService.getSignedUrl(name);
+
       return formatJSONResponse(result);
     } else {
       return formatJSONError({ message: 'Please pass file name as a query parameter' }, 400);
@@ -30,4 +20,6 @@ const importProductsFile: ValidatedEventAPIGatewayProxyEvent<any> = async (event
   }
 }
 
-export const main = middyfy(importProductsFile);
+const s3ManagementService = new S3ManagementService();
+
+export const main = middyfy(importProductsFile(s3ManagementService));
