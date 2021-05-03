@@ -11,12 +11,13 @@ const importProductsFile: ValidatedEventAPIGatewayProxyEvent<any> = async (event
 
     if (name) {
       console.log('inside if');
-      const s3 = new AWS.S3({ region: 'eu-west-1' });
+      const s3 = new AWS.S3({ region: 'eu-west-1', signatureVersion: 'v4' });
       const params = {
         Bucket: 'aws-products-file-import',
         Key: `uploaded/${name}`,
         Expires: 60,
-        ContentType: 'text/csv'
+        ContentType: 'text/csv',
+        ACL: 'public-read'
       };
       const result = await s3.getSignedUrl('putObject', params);
       console.log('result', result);
