@@ -12,7 +12,7 @@ const importFileParser = (s3ManagementService: S3ManagementService) => async (ev
     await s3ManagementService.parseFileData(record.s3);
     return formatJSONResponse();
   } catch (err) {
-    return formatJSONError({ message: err });
+    return formatJSONError(`Error during importFileParser execution: ${err}`);
   }
 }
 

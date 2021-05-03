@@ -13,10 +13,10 @@ const importProductsFile = (s3ManagementService: S3ManagementService) => async (
 
       return formatJSONResponse(result);
     } else {
-      return formatJSONError({ message: 'Please pass file name as a query parameter' }, 400);
+      return formatJSONError('Please pass file name as a query parameter', 400);
     }
   } catch (err) {
-    return formatJSONError({ message: err });
+    return formatJSONError(`Error during importProductsFile execution: ${err}`);
   }
 }
 
