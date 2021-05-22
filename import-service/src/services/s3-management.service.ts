@@ -41,12 +41,22 @@ export class S3ManagementService {
     const bucketName = bucket.name;
     const filePath = object.key;
     const s3Stream = this.s3.getObject({ Bucket: bucketName, Key: filePath }).createReadStream();
+    const sqs = new AWS.SQS();
 
     return new Promise((resolve, reject) => {
       s3Stream
         .pipe(csv())
-        .on('data', (data) => console.log(`Parsed data: ${JSON.stringify(data)}`))
-        .on('error', (err) => reject(`Error during parsing file's data: ${err}`))
+        .on('data', async (data) => {
+          console.log(`Parsed data: ${JSON.stringify(data)}`);
+
+          console.log('send message');
+          await sqs.sendMessage({
+            QueueUrl: process.env.SQS_URL,
+            MessageBody: JSON.stringify(data),
+          }).promise();
+          console.log('success');
+        })
+        .on('error', (err) => {console.log('error callback'); reject(`Error during parsing file's data: ${err}`); })
         .on('end', async () => {
           await this.moveFileToAnotherFolder(bucketName, filePath, 'parsed');
           resolve();
