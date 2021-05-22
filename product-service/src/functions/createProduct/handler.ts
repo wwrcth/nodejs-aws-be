@@ -1,5 +1,4 @@
 import 'source-map-support/register';
-import Joi from 'joi';
 
 import { formatJSONResponse, formatJSONError } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
@@ -9,15 +8,8 @@ import { ProductService } from '@services/product.service';
 const createProduct = (productService: ProductService) => async (event) => {
   try {
     const newProduct = event.body;
-    const newProductValidationScheme = Joi.object({
-      title: Joi.string().required(),
-      description: Joi.string(),
-      price: Joi.number().integer().min(1).max(250),
-      count: Joi.number().integer().min(1).max(250),
-    });
-    const { error } = newProductValidationScheme.validate(newProduct);
 
-    if (error) {
+    if (!productService.isProductValid(newProduct)) {
       return formatJSONError({ message: 'Please pass correct product structure' }, 400);
     }
 

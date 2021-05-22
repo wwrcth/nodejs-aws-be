@@ -1,9 +1,23 @@
+import Joi from 'joi';
+
 import { DbConnectService } from '@services/db-connect.service';
 
 export class ProductService {
   constructor(
     private dbConnectService: DbConnectService,
   ) {}
+
+  isProductValid(newProduct: Record<string, unknown>): boolean {
+    const newProductValidationScheme = Joi.object({
+      title: Joi.string().required(),
+      description: Joi.string(),
+      price: Joi.number().integer().min(1).max(250),
+      count: Joi.number().integer().min(1).max(250),
+    });
+    const { error } = newProductValidationScheme.validate(newProduct);
+
+    return !error;
+  }
 
   async getAllProducts() {
     const { rows } = await this.dbConnectService.runQuery(
