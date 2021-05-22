@@ -1,10 +1,14 @@
 import AWS from 'aws-sdk';
 import csv from 'csv-parser';
 
+import { SqsManagementService } from '@services/sqs-management.service';
+
 export class S3ManagementService {
   private s3;
 
-  constructor() {
+  constructor(
+    private sqsManagementService: SqsManagementService,
+  ) {
     this.s3 = new AWS.S3({ region: 'eu-west-1', signatureVersion: 'v4' });
   }
 
@@ -45,8 +49,15 @@ export class S3ManagementService {
     return new Promise((resolve, reject) => {
       s3Stream
         .pipe(csv())
-        .on('data', (data) => console.log(`Parsed data: ${JSON.stringify(data)}`))
-        .on('error', (err) => reject(`Error during parsing file's data: ${err}`))
+        .on('data', async (data) => {
+          console.log(`Parsed data: ${JSON.stringify(data)}`);
+
+          if (this.sqsManagementService) {
+            await this.sqsManagementService.sendMessage(data);
+            console.log('Sending message to SQS is finished');
+          }
+        })
+        .on('error', (err) => {console.log('error callback'); reject(`Error during parsing file's data: ${err}`); })
         .on('end', async () => {
           await this.moveFileToAnotherFolder(bucketName, filePath, 'parsed');
           resolve();

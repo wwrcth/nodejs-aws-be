@@ -3,6 +3,8 @@ import { S3Event } from 'aws-lambda';
 
 import { formatJSONResponse, formatJSONError } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
+
+import { SqsManagementService } from '@services/sqs-management.service';
 import { S3ManagementService } from '@services/s3-management.service';
 
 const importFileParser = (s3ManagementService: S3ManagementService) => async (event: S3Event) => {
@@ -16,6 +18,7 @@ const importFileParser = (s3ManagementService: S3ManagementService) => async (ev
   }
 }
 
-const s3ManagementService = new S3ManagementService();
+const sqsManagementService = new SqsManagementService();
+const s3ManagementService = new S3ManagementService(sqsManagementService);
 
 export const main = middyfy(importFileParser(s3ManagementService));

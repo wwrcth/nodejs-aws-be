@@ -24,6 +24,7 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      SQS_URL: '${cf:product-service-dev.CatalogItemsQueueUrl}',
     },
     lambdaHashingVersion: '20201221',
     iam: {
@@ -38,6 +39,11 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: 's3:*',
             Resource: 'arn:aws:s3:::aws-products-file-import/*',
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sqs:SendMessage',
+            Resource: '${cf:product-service-dev.CatalogItemsQueueArn}',
           },
         ],
       },
