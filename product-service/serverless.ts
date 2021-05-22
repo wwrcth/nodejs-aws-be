@@ -79,6 +79,7 @@ const serverlessConfiguration: AWS = {
       createProductSubscription: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
+          // todo: use env variable instead
           Endpoint: 'wwrcth@gmail.com',
           Protocol: 'email',
           TopicArn: {
